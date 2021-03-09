@@ -14,6 +14,10 @@ class Board:
         self.white_to_play = white_to_play
 
     def add_piece(self, symbol, pos_str, is_white):
+        pos = string_to_pos(pos_str)
+        if pos in self.pieces:
+            raise Exception('position + {} already taken'.format(pos))
+
         if symbol == 'b':
             piece = Bishop(is_white=is_white)
         elif symbol == 'p':
@@ -28,7 +32,7 @@ class Board:
             piece = King(is_white=is_white)
         else:
             raise Exception('symbol + {} not recognized'.format(symbol))
-        self.pieces[string_to_pos(pos_str)] = piece
+        self.pieces[pos] = piece
 
     def init_simple(self):
         self.add_piece('p', 'b1', is_white=True)
@@ -113,20 +117,154 @@ class Bishop(Piece):
         Piece.__init__(self, is_white=is_white)
         self.symbol = 'b'
 
+    def available_moves(self, curr_pos, board):
+        naives = []
+        curr_row = curr_pos[0]
+        curr_col = curr_pos[1]
+
+        tmp_row = curr_row + 1
+        tmp_col = curr_col + 1
+        while tmp_row < 8 and tmp_col < 8:
+            naives.append((tmp_row, tmp_col))
+            tmp_row += 1
+            tmp_col += 1
+
+        tmp_row = curr_row - 1
+        tmp_col = curr_col - 1
+        while tmp_row >= 0 and tmp_col >= 0:
+            naives.append((tmp_row, tmp_col))
+            tmp_row -= 1
+            tmp_col -= 1
+
+        tmp_row = curr_row + 1
+        tmp_col = curr_col - 1
+        while tmp_row < 8 and tmp_col >= 0:
+            naives.append((tmp_row, tmp_col))
+            tmp_row += 1
+            tmp_col -= 1
+
+        tmp_row = curr_row - 1
+        tmp_col = curr_col + 1
+        while tmp_row >= 0 and tmp_col < 8:
+            naives.append((tmp_row, tmp_col))
+            tmp_row -= 1
+            tmp_col += 1
+
+        naives = [m for m in naives if board.is_available_cell(m)]
+        return ['B' + pos_to_string(p) for p in naives]
+
 class Queen(Piece):
     def __init__(self, is_white):
         Piece.__init__(self, is_white=is_white)
         self.symbol = 'q'
+
+    def available_moves(self, curr_pos, board):
+        naives = []
+        curr_row = curr_pos[0]
+        curr_col = curr_pos[1]
+
+        tmp_row = curr_row + 1
+        tmp_col = curr_col + 1
+        while tmp_row < 8 and tmp_col < 8:
+            naives.append((tmp_row, tmp_col))
+            tmp_row += 1
+            tmp_col += 1
+
+        tmp_row = curr_row - 1
+        tmp_col = curr_col - 1
+        while tmp_row >= 0 and tmp_col >= 0:
+            naives.append((tmp_row, tmp_col))
+            tmp_row -= 1
+            tmp_col -= 1
+
+        tmp_row = curr_row + 1
+        tmp_col = curr_col - 1
+        while tmp_row < 8 and tmp_col >= 0:
+            naives.append((tmp_row, tmp_col))
+            tmp_row += 1
+            tmp_col -= 1
+
+        tmp_row = curr_row - 1
+        tmp_col = curr_col + 1
+        while tmp_row >= 0 and tmp_col < 8:
+            naives.append((tmp_row, tmp_col))
+            tmp_row -= 1
+            tmp_col += 1
+
+        tmp_row = curr_row + 1
+        while tmp_row < 8:
+            naives.append((tmp_row, curr_col))
+            tmp_row += 1
+
+        tmp_row = curr_row - 1
+        while tmp_row >= 0:
+            naives.append((tmp_row, curr_col))
+            tmp_row -= 1
+
+        tmp_col = curr_col + 1
+        while tmp_col < 8:
+            naives.append((curr_row, tmp_col))
+            tmp_col += 1
+
+        tmp_col = curr_col - 1
+        while tmp_col >= 0:
+            naives.append((curr_row, tmp_col))
+            tmp_col -= 1
+
+        naives = [m for m in naives if board.is_available_cell(m)]
+        return ['Q' + pos_to_string(p) for p in naives]
 
 class King(Piece):
     def __init__(self, is_white):
         Piece.__init__(self, is_white=is_white)
         self.symbol = 'k'
 
+    def available_moves(self, curr_pos, board):
+        naives = []
+
+        naives.append((curr_pos[0] - 1, curr_pos[1] - 1))
+        naives.append((curr_pos[0], curr_pos[1] - 1))
+        naives.append((curr_pos[0] + 1, curr_pos[1] - 1))
+        naives.append((curr_pos[0] - 1, curr_pos[1] + 1))
+        naives.append((curr_pos[0], curr_pos[1] + 1))
+        naives.append((curr_pos[0] + 1, curr_pos[1] + 1))
+        naives.append((curr_pos[0] + 1, curr_pos[1]))
+        naives.append((curr_pos[0] - 1, curr_pos[1]))
+        naives = [m for m in naives if board.is_available_cell(m)]
+        return ['K' + pos_to_string(p) for p in naives]
+
 class Rook(Piece):
     def __init__(self, is_white):
         Piece.__init__(self, is_white=is_white)
         self.symbol = 'r'
+
+    def available_moves(self, curr_pos, board):
+        naives = []
+        curr_row = curr_pos[0]
+        curr_col = curr_pos[1]
+
+        tmp_row = curr_row + 1
+        while tmp_row < 8:
+            naives.append((tmp_row, curr_col))
+            tmp_row += 1
+
+        tmp_row = curr_row - 1
+        while tmp_row >= 0:
+            naives.append((tmp_row, curr_col))
+            tmp_row -= 1
+
+        tmp_col = curr_col + 1
+        while tmp_col < 8:
+            naives.append((curr_row, tmp_col))
+            tmp_col += 1
+
+        tmp_col = curr_col - 1
+        while tmp_col >= 0:
+            naives.append((curr_row, tmp_col))
+            tmp_col -= 1
+
+        naives = [m for m in naives if board.is_available_cell(m)]
+        return ['R' + pos_to_string(p) for p in naives]
 
 class Knight(Piece):
     def __init__(self, is_white):
