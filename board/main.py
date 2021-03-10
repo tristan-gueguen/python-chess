@@ -119,6 +119,7 @@ class Bishop(Piece):
 
     def available_moves(self, curr_pos, board):
         naives = []
+        consider_takes = []
         curr_row = curr_pos[0]
         curr_col = curr_pos[1]
 
@@ -127,6 +128,7 @@ class Bishop(Piece):
         while tmp_row < 8 and tmp_col < 8:
             pos = (tmp_row, tmp_col)
             if not board.is_empty_cell(pos):
+                consider_takes.append(pos)
                 break
             naives.append(pos)
             tmp_row += 1
@@ -137,6 +139,7 @@ class Bishop(Piece):
         while tmp_row >= 0 and tmp_col >= 0:
             pos = (tmp_row, tmp_col)
             if not board.is_empty_cell(pos):
+                consider_takes.append(pos)
                 break
             naives.append(pos)
             tmp_row -= 1
@@ -147,6 +150,7 @@ class Bishop(Piece):
         while tmp_row < 8 and tmp_col >= 0:
             pos = (tmp_row, tmp_col)
             if not board.is_empty_cell(pos):
+                consider_takes.append(pos)
                 break
             naives.append(pos)
             tmp_row += 1
@@ -157,13 +161,19 @@ class Bishop(Piece):
         while tmp_row >= 0 and tmp_col < 8:
             pos = (tmp_row, tmp_col)
             if not board.is_empty_cell(pos):
+                consider_takes.append(pos)
                 break
             naives.append(pos)
             tmp_row -= 1
             tmp_col += 1
 
+        takes = [m for m in consider_takes if board.pieces[m].is_white != self.is_white]
+        takes = ['Bx' + pos_to_string(m) for m in takes]
+
+        moves = ['B' + pos_to_string(p) for p in naives]
+
         # naives = [m for m in naives if board.is_available_cell(m)]
-        return ['B' + pos_to_string(p) for p in naives]
+        return moves + takes
 
 class Queen(Piece):
     def __init__(self, is_white):
@@ -172,6 +182,7 @@ class Queen(Piece):
 
     def available_moves(self, curr_pos, board):
         naives = []
+        consider_takes = []
         curr_row = curr_pos[0]
         curr_col = curr_pos[1]
 
@@ -180,6 +191,7 @@ class Queen(Piece):
         while tmp_row < 8 and tmp_col < 8:
             pos = (tmp_row, tmp_col)
             if not board.is_empty_cell(pos):
+                consider_takes.append(pos)
                 break
             naives.append(pos)
             tmp_row += 1
@@ -190,6 +202,7 @@ class Queen(Piece):
         while tmp_row >= 0 and tmp_col >= 0:
             pos = (tmp_row, tmp_col)
             if not board.is_empty_cell(pos):
+                consider_takes.append(pos)
                 break
             naives.append(pos)
             tmp_row -= 1
@@ -200,6 +213,7 @@ class Queen(Piece):
         while tmp_row < 8 and tmp_col >= 0:
             pos = (tmp_row, tmp_col)
             if not board.is_empty_cell(pos):
+                consider_takes.append(pos)
                 break
             naives.append(pos)
             tmp_row += 1
@@ -210,6 +224,7 @@ class Queen(Piece):
         while tmp_row >= 0 and tmp_col < 8:
             pos = (tmp_row, tmp_col)
             if not board.is_empty_cell(pos):
+                consider_takes.append(pos)
                 break
             naives.append(pos)
             tmp_row -= 1
@@ -219,6 +234,7 @@ class Queen(Piece):
         while tmp_row < 8:
             pos = (tmp_row, curr_col)
             if not board.is_empty_cell(pos):
+                consider_takes.append(pos)
                 break
             naives.append(pos)
             tmp_row += 1
@@ -227,6 +243,7 @@ class Queen(Piece):
         while tmp_row >= 0:
             pos = (tmp_row, curr_col)
             if not board.is_empty_cell(pos):
+                consider_takes.append(pos)
                 break
             naives.append(pos)
             tmp_row -= 1
@@ -235,6 +252,7 @@ class Queen(Piece):
         while tmp_col < 8:
             pos = (curr_row, tmp_col)
             if not board.is_empty_cell(pos):
+                consider_takes.append(pos)
                 break
             naives.append(pos)
             tmp_col += 1
@@ -243,12 +261,17 @@ class Queen(Piece):
         while tmp_col >= 0:
             pos = (curr_row, tmp_col)
             if not board.is_empty_cell(pos):
+                consider_takes.append(pos)
                 break
             naives.append(pos)
             tmp_col -= 1
 
+        takes = [m for m in consider_takes if board.pieces[m].is_white != self.is_white]
+        takes = ['Qx' + pos_to_string(m) for m in takes]
         naives = [m for m in naives if board.is_available_cell(m)]
-        return ['Q' + pos_to_string(p) for p in naives]
+
+        moves = ['Q' + pos_to_string(p) for p in naives]
+        return moves + takes
 
 class King(Piece):
     def __init__(self, is_white):
@@ -266,8 +289,13 @@ class King(Piece):
         naives.append((curr_pos[0] + 1, curr_pos[1] + 1))
         naives.append((curr_pos[0] + 1, curr_pos[1]))
         naives.append((curr_pos[0] - 1, curr_pos[1]))
-        naives = [m for m in naives if board.is_available_cell(m)]
-        return ['K' + pos_to_string(p) for p in naives]
+        naives = [m for m in naives if board.is_valid_cell(m)]
+        moves = [m for m in naives if board.is_empty_cell(m)]
+        takes = [m for m in naives if not board.is_empty_cell(m)]
+        takes = [m for m in takes if board.pieces[m].is_white != self.is_white]
+        moves = ['K' + pos_to_string(p) for p in moves]
+        takes = ['Kx' + pos_to_string(p) for p in takes]
+        return moves + takes
 
 class Rook(Piece):
     def __init__(self, is_white):
@@ -276,6 +304,7 @@ class Rook(Piece):
 
     def available_moves(self, curr_pos, board):
         naives = []
+        consider_takes = []
         curr_row = curr_pos[0]
         curr_col = curr_pos[1]
 
@@ -283,6 +312,7 @@ class Rook(Piece):
         while tmp_row < 8:
             pos = (tmp_row, curr_col)
             if not board.is_empty_cell(pos):
+                consider_takes.append(pos)
                 break
             naives.append(pos)
             tmp_row += 1
@@ -291,6 +321,7 @@ class Rook(Piece):
         while tmp_row >= 0:
             pos = (tmp_row, curr_col)
             if not board.is_empty_cell(pos):
+                consider_takes.append(pos)
                 break
             naives.append(pos)
             tmp_row -= 1
@@ -299,6 +330,7 @@ class Rook(Piece):
         while tmp_col < 8:
             pos = (curr_row, tmp_col)
             if not board.is_empty_cell(pos):
+                consider_takes.append(pos)
                 break
             naives.append(pos)
             tmp_col += 1
@@ -307,12 +339,17 @@ class Rook(Piece):
         while tmp_col >= 0:
             pos = (curr_row, tmp_col)
             if not board.is_empty_cell(pos):
+                consider_takes.append(pos)
                 break
             naives.append(pos)
             tmp_col -= 1
 
+        takes = [m for m in consider_takes if board.pieces[m].is_white != self.is_white]
+        takes = ['Rx' + pos_to_string(m) for m in takes]
+
         naives = [m for m in naives if board.is_available_cell(m)]
-        return ['R' + pos_to_string(p) for p in naives]
+        moves = ['R' + pos_to_string(p) for p in naives]
+        return moves + takes
 
 class Knight(Piece):
     def __init__(self, is_white):
@@ -332,8 +369,13 @@ class Knight(Piece):
         candidates.append((curr_row + 2, curr_col - 1))
         candidates.append((curr_row - 2, curr_col - 1))
         candidates = [m for m in candidates if board.is_valid_cell(m)]
-        candidates = [m for m in candidates if board.is_empty_cell(m)]
-        return ['N' + pos_to_string(p) for p in candidates]
+
+        moves = [m for m in candidates if board.is_empty_cell(m)]
+        takes = [m for m in candidates if not board.is_empty_cell(m)]
+        takes = [m for m in takes if board.pieces[m].is_white != self.is_white]
+        moves = ['N' + pos_to_string(p) for p in moves]
+        takes = ['Nx' + pos_to_string(p) for p in takes]
+        return moves + takes
 
 class Pawn(Piece):
     def __init__(self, is_white):
@@ -342,6 +384,7 @@ class Pawn(Piece):
 
     def available_moves(self, curr_pos, board):
         naives = []
+        takes = []
         if self.is_white:
             pos = (curr_pos[0] + 1, curr_pos[1])
             if board.is_empty_cell(pos):
@@ -350,6 +393,7 @@ class Pawn(Piece):
                     pos = (curr_pos[0] + 2, curr_pos[1])
                     if board.is_empty_cell(pos):
                         naives.append(pos)
+            pos_takes = [(curr_pos[0] + 1, curr_pos[1] + 1), (curr_pos[0] + 1, curr_pos[1] - 1)]
         else:
             pos = (curr_pos[0] - 1, curr_pos[1])
             if board.is_empty_cell(pos):
@@ -358,8 +402,15 @@ class Pawn(Piece):
                     pos = (curr_pos[0] - 2, curr_pos[1])
                     if board.is_empty_cell(pos):
                         naives.append(pos)
+            pos_takes = [(curr_pos[0] - 1, curr_pos[1] + 1), (curr_pos[0] - 1, curr_pos[1] - 1)]
         naives = [m for m in naives if board.is_valid_cell(m)]
-        return [pos_to_string(p) for p in naives]
+
+        pos_takes = [m for m in pos_takes if not board.is_empty_cell(m)]
+        pos_takes = [m for m in pos_takes if board.pieces[m].is_white != self.is_white]
+        suffix_takes = pos_to_string(curr_pos)[0]
+        takes = [suffix_takes + 'x' + pos_to_string(m) for m in pos_takes]
+        moves = [pos_to_string(p) for p in naives]
+        return moves + takes
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':

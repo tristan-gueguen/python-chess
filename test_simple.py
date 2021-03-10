@@ -291,7 +291,7 @@ def test_king_takes_pawns():
 
 def test_queen_takes_pawns():
     b = main.Board()
-    b.add_piece('Q', 'd4', is_white=True)
+    b.add_piece('q', 'd4', is_white=True)
     b.add_piece('p', 'd5', is_white=False)
     b.add_piece('p', 'd3', is_white=False)
     b.add_piece('p', 'e3', is_white=False)
