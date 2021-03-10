@@ -125,32 +125,44 @@ class Bishop(Piece):
         tmp_row = curr_row + 1
         tmp_col = curr_col + 1
         while tmp_row < 8 and tmp_col < 8:
-            naives.append((tmp_row, tmp_col))
+            pos = (tmp_row, tmp_col)
+            if not board.is_empty_cell(pos):
+                break
+            naives.append(pos)
             tmp_row += 1
             tmp_col += 1
 
         tmp_row = curr_row - 1
         tmp_col = curr_col - 1
         while tmp_row >= 0 and tmp_col >= 0:
-            naives.append((tmp_row, tmp_col))
+            pos = (tmp_row, tmp_col)
+            if not board.is_empty_cell(pos):
+                break
+            naives.append(pos)
             tmp_row -= 1
             tmp_col -= 1
 
         tmp_row = curr_row + 1
         tmp_col = curr_col - 1
         while tmp_row < 8 and tmp_col >= 0:
-            naives.append((tmp_row, tmp_col))
+            pos = (tmp_row, tmp_col)
+            if not board.is_empty_cell(pos):
+                break
+            naives.append(pos)
             tmp_row += 1
             tmp_col -= 1
 
         tmp_row = curr_row - 1
         tmp_col = curr_col + 1
         while tmp_row >= 0 and tmp_col < 8:
-            naives.append((tmp_row, tmp_col))
+            pos = (tmp_row, tmp_col)
+            if not board.is_empty_cell(pos):
+                break
+            naives.append(pos)
             tmp_row -= 1
             tmp_col += 1
 
-        naives = [m for m in naives if board.is_available_cell(m)]
+        # naives = [m for m in naives if board.is_available_cell(m)]
         return ['B' + pos_to_string(p) for p in naives]
 
 class Queen(Piece):
@@ -166,49 +178,73 @@ class Queen(Piece):
         tmp_row = curr_row + 1
         tmp_col = curr_col + 1
         while tmp_row < 8 and tmp_col < 8:
-            naives.append((tmp_row, tmp_col))
+            pos = (tmp_row, tmp_col)
+            if not board.is_empty_cell(pos):
+                break
+            naives.append(pos)
             tmp_row += 1
             tmp_col += 1
 
         tmp_row = curr_row - 1
         tmp_col = curr_col - 1
         while tmp_row >= 0 and tmp_col >= 0:
-            naives.append((tmp_row, tmp_col))
+            pos = (tmp_row, tmp_col)
+            if not board.is_empty_cell(pos):
+                break
+            naives.append(pos)
             tmp_row -= 1
             tmp_col -= 1
 
         tmp_row = curr_row + 1
         tmp_col = curr_col - 1
         while tmp_row < 8 and tmp_col >= 0:
-            naives.append((tmp_row, tmp_col))
+            pos = (tmp_row, tmp_col)
+            if not board.is_empty_cell(pos):
+                break
+            naives.append(pos)
             tmp_row += 1
             tmp_col -= 1
 
         tmp_row = curr_row - 1
         tmp_col = curr_col + 1
         while tmp_row >= 0 and tmp_col < 8:
-            naives.append((tmp_row, tmp_col))
+            pos = (tmp_row, tmp_col)
+            if not board.is_empty_cell(pos):
+                break
+            naives.append(pos)
             tmp_row -= 1
             tmp_col += 1
 
         tmp_row = curr_row + 1
         while tmp_row < 8:
-            naives.append((tmp_row, curr_col))
+            pos = (tmp_row, curr_col)
+            if not board.is_empty_cell(pos):
+                break
+            naives.append(pos)
             tmp_row += 1
 
         tmp_row = curr_row - 1
         while tmp_row >= 0:
-            naives.append((tmp_row, curr_col))
+            pos = (tmp_row, curr_col)
+            if not board.is_empty_cell(pos):
+                break
+            naives.append(pos)
             tmp_row -= 1
 
         tmp_col = curr_col + 1
         while tmp_col < 8:
-            naives.append((curr_row, tmp_col))
+            pos = (curr_row, tmp_col)
+            if not board.is_empty_cell(pos):
+                break
+            naives.append(pos)
             tmp_col += 1
 
         tmp_col = curr_col - 1
         while tmp_col >= 0:
-            naives.append((curr_row, tmp_col))
+            pos = (curr_row, tmp_col)
+            if not board.is_empty_cell(pos):
+                break
+            naives.append(pos)
             tmp_col -= 1
 
         naives = [m for m in naives if board.is_available_cell(m)]
@@ -245,22 +281,34 @@ class Rook(Piece):
 
         tmp_row = curr_row + 1
         while tmp_row < 8:
-            naives.append((tmp_row, curr_col))
+            pos = (tmp_row, curr_col)
+            if not board.is_empty_cell(pos):
+                break
+            naives.append(pos)
             tmp_row += 1
 
         tmp_row = curr_row - 1
         while tmp_row >= 0:
-            naives.append((tmp_row, curr_col))
+            pos = (tmp_row, curr_col)
+            if not board.is_empty_cell(pos):
+                break
+            naives.append(pos)
             tmp_row -= 1
 
         tmp_col = curr_col + 1
         while tmp_col < 8:
-            naives.append((curr_row, tmp_col))
+            pos = (curr_row, tmp_col)
+            if not board.is_empty_cell(pos):
+                break
+            naives.append(pos)
             tmp_col += 1
 
         tmp_col = curr_col - 1
         while tmp_col >= 0:
-            naives.append((curr_row, tmp_col))
+            pos = (curr_row, tmp_col)
+            if not board.is_empty_cell(pos):
+                break
+            naives.append(pos)
             tmp_col -= 1
 
         naives = [m for m in naives if board.is_available_cell(m)]
@@ -272,19 +320,20 @@ class Knight(Piece):
         self.symbol = 'n'
 
     def available_moves(self, curr_pos, board):
-        naives = []
+        candidates = []
         curr_row = curr_pos[0]
         curr_col = curr_pos[1]
-        naives.append((curr_row + 1, curr_col + 2))
-        naives.append((curr_row + 1, curr_col - 2))
-        naives.append((curr_row - 1, curr_col + 2))
-        naives.append((curr_row - 1, curr_col - 2))
-        naives.append((curr_row + 2, curr_col + 1))
-        naives.append((curr_row - 2, curr_col + 1))
-        naives.append((curr_row + 2, curr_col - 1))
-        naives.append((curr_row - 2, curr_col - 1))
-        naives = [m for m in naives if board.is_available_cell(m)]
-        return ['N' + pos_to_string(p) for p in naives]
+        candidates.append((curr_row + 1, curr_col + 2))
+        candidates.append((curr_row + 1, curr_col - 2))
+        candidates.append((curr_row - 1, curr_col + 2))
+        candidates.append((curr_row - 1, curr_col - 2))
+        candidates.append((curr_row + 2, curr_col + 1))
+        candidates.append((curr_row - 2, curr_col + 1))
+        candidates.append((curr_row + 2, curr_col - 1))
+        candidates.append((curr_row - 2, curr_col - 1))
+        candidates = [m for m in candidates if board.is_valid_cell(m)]
+        candidates = [m for m in candidates if board.is_empty_cell(m)]
+        return ['N' + pos_to_string(p) for p in candidates]
 
 class Pawn(Piece):
     def __init__(self, is_white):
@@ -294,10 +343,22 @@ class Pawn(Piece):
     def available_moves(self, curr_pos, board):
         naives = []
         if self.is_white:
-            naives.append((curr_pos[0] + 1, curr_pos[1]))
+            pos = (curr_pos[0] + 1, curr_pos[1])
+            if board.is_empty_cell(pos):
+                naives.append(pos)
+                if curr_pos[0] == 1:
+                    pos = (curr_pos[0] + 2, curr_pos[1])
+                    if board.is_empty_cell(pos):
+                        naives.append(pos)
         else:
-            naives.append((curr_pos[0] - 1, curr_pos[1]))
-        naives = [m for m in naives if board.is_available_cell(m)]
+            pos = (curr_pos[0] - 1, curr_pos[1])
+            if board.is_empty_cell(pos):
+                naives.append(pos)
+                if curr_pos[0] == 6:
+                    pos = (curr_pos[0] - 2, curr_pos[1])
+                    if board.is_empty_cell(pos):
+                        naives.append(pos)
+        naives = [m for m in naives if board.is_valid_cell(m)]
         return [pos_to_string(p) for p in naives]
 
 # Press the green button in the gutter to run the script.

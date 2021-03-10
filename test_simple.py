@@ -77,6 +77,14 @@ def test_lonely_centered_pawn_black():
     assert len(moves) == 1
     assert 'd3' in moves
 
+def test_lonely_start_row_pawn_white():
+    b = main.Board()
+    b.add_piece('p', 'a2', True)
+    moves = b.get_possible_moves()
+    assert len(moves) == 2
+    assert 'a3' in moves
+    assert 'a4' in moves
+
 def test_lonely_centered_pawn_white():
     b = main.Board()
     b.add_piece('p', 'd4', True)
@@ -161,4 +169,136 @@ def test_bishop_blocked_by_pawn():
     b.add_piece('b', 'a1', True)
     b.add_piece('p', 'b2', True)
     moves = b.get_possible_moves()
-    assert len(moves) == 0
+    assert len(moves) == 2
+
+
+def test_knight_blocked_by_pawn():
+    b = main.Board()
+    b.add_piece('n', 'a1', True)
+    b.add_piece('p', 'c2', True)
+    moves = b.get_possible_moves()
+    assert len(moves) == 3
+    assert 'c3' in moves
+    assert 'c4' in moves
+    assert 'Nb3' in moves
+
+def test_rook_blocked_by_pawn():
+    b = main.Board()
+    b.add_piece('r', 'a1', True)
+    b.add_piece('p', 'a2', True)
+    b.add_piece('p', 'b1', True)
+    moves = b.get_possible_moves()
+    assert len(moves) == 3
+    assert 'a3' in moves
+    assert 'a4' in moves
+    assert 'b2' in moves
+
+def test_queen_blocked_by_pawn():
+    b = main.Board()
+    b.add_piece('q', 'a1', True)
+    b.add_piece('p', 'a2', True)
+    b.add_piece('p', 'b1', True)
+    moves = b.get_possible_moves()
+    assert len(moves) == 10
+    assert 'a3' in moves
+    assert 'a4' in moves
+    assert 'b2' in moves
+
+def test_king_blocked_by_pawn():
+    b = main.Board()
+    b.add_piece('k', 'a1', True)
+    b.add_piece('p', 'a2', True)
+    b.add_piece('p', 'b1', True)
+    moves = b.get_possible_moves()
+    assert len(moves) == 4
+    assert 'a3' in moves
+    assert 'a4' in moves
+    assert 'b2' in moves
+
+def test_pawn_blocked_by_pawn():
+    b = main.Board()
+    b.add_piece('p', 'd2', True)
+    b.add_piece('p', 'd3', True)
+    moves = b.get_possible_moves()
+    assert len(moves) == 1
+    assert 'd4' in moves
+
+def test_number_moves_default():
+    b = main.Board()
+    b.init_default()
+    moves = b.get_possible_moves()
+    assert len(moves) == 20
+
+def test_pawn_takes_pawn():
+    b = main.Board()
+    b.add_piece('p', 'd4', is_white=True)
+    b.add_piece('p', 'e5', is_white=False)
+    moves = b.get_possible_moves()
+    assert len(moves) == 2
+    assert 'd5' in moves
+    assert 'dxe5' in moves
+
+def test_pawn_takes_pawns():
+    b = main.Board()
+    b.add_piece('p', 'd4', is_white=True)
+    b.add_piece('p', 'e5', is_white=False)
+    b.add_piece('p', 'c5', is_white=False)
+    moves = b.get_possible_moves()
+    assert len(moves) == 3
+    assert 'd5' in moves
+    assert 'dxe5' in moves
+    assert 'dxc5' in moves
+
+def test_knight_takes_pawns():
+    b = main.Board()
+    b.add_piece('n', 'd4', is_white=True)
+    b.add_piece('p', 'e6', is_white=False)
+    b.add_piece('p', 'c2', is_white=False)
+    moves = b.get_possible_moves()
+    assert len(moves) == 8
+    assert 'Nf5' in moves
+    assert 'Nxe6' in moves
+    assert 'Nxc2' in moves
+
+def test_rook_takes_pawn():
+    b = main.Board()
+    b.add_piece('r', 'a1', is_white=True)
+    b.add_piece('p', 'a8', is_white=False)
+    moves = b.get_possible_moves()
+    assert len(moves) == 14
+    assert 'Ra4' in moves
+    assert 'Rxa8' in moves
+
+def test_bishop_takes_pawn():
+    b = main.Board()
+    b.add_piece('b', 'a1', is_white=True)
+    b.add_piece('p', 'b2', is_white=False)
+    moves = b.get_possible_moves()
+    assert len(moves) == 1
+    assert 'Bxb2' in moves
+
+def test_king_takes_pawns():
+    b = main.Board()
+    b.add_piece('k', 'a1', is_white=True)
+    b.add_piece('p', 'a2', is_white=False)
+    b.add_piece('p', 'b1', is_white=False)
+    b.add_piece('p', 'b2', is_white=False)
+    moves = b.get_possible_moves()
+    assert len(moves) == 3
+    assert 'Kxa2' in moves
+    assert 'Kxb1' in moves
+    assert 'Kxb2' in moves
+
+def test_queen_takes_pawns():
+    b = main.Board()
+    b.add_piece('Q', 'd4', is_white=True)
+    b.add_piece('p', 'd5', is_white=False)
+    b.add_piece('p', 'd3', is_white=False)
+    b.add_piece('p', 'e3', is_white=False)
+    b.add_piece('p', 'e4', is_white=False)
+    b.add_piece('p', 'e5', is_white=False)
+    b.add_piece('p', 'c3', is_white=False)
+    b.add_piece('p', 'c4', is_white=False)
+    b.add_piece('p', 'c5', is_white=False)
+    moves = b.get_possible_moves()
+    assert len(moves) == 8
