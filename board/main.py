@@ -1,3 +1,22 @@
+class Move:
+    def __init__(self, piece_symbol, from_pos, to_pos, is_take=False):
+        self.piece_symbol = piece_symbol
+        self.from_pos = from_pos
+        self.to_pos = to_pos
+        self.is_take = is_take
+
+    def to_string(self):
+        str_takes = ''
+        if self.is_take:
+            str_takes = 'x'
+        str_piece = ''
+        if self.piece_symbol.upper() != 'P':
+            str_piece = self.piece_symbol.upper()
+        else:
+            if self.is_take:
+                str_piece = pos_to_string(self.from_pos)[0]
+        return str_piece + str_takes + pos_to_string(self.to_pos)
+
 def pos_to_string(pos):
     row = pos[0]
     col = pos[1]
@@ -73,7 +92,6 @@ class Board:
 
     def init_fen(self, fen):
         parts = fen.split(' ')
-        print(parts)
         self.white_to_play = parts[1] == 'w'
 
         row_idx = 0
@@ -94,7 +112,7 @@ class Board:
         pieces_color = {pos: piece for (pos, piece) in self.pieces.items() if piece.is_white == self.white_to_play}
         for pos, piece in pieces_color.items():
             list_moves += piece.available_moves(pos, self)
-        return list_moves
+        return [m.to_string() for m in list_moves]
 
     def get_board(self):
         ret = []
@@ -185,11 +203,11 @@ class Bishop(Piece):
             tmp_col += 1
 
         takes = [m for m in consider_takes if board.pieces[m].is_white != self.is_white]
-        takes = ['Bx' + pos_to_string(m) for m in takes]
+        # takes = ['Bx' + pos_to_string(m) for m in takes]
+        takes = [Move(self.symbol, curr_pos, m, is_take=True) for m in takes]
 
-        moves = ['B' + pos_to_string(p) for p in naives]
-
-        # naives = [m for m in naives if board.is_available_cell(m)]
+        # moves = ['B' + pos_to_string(p) for p in naives]
+        moves = [Move(self.symbol, curr_pos, m, is_take=False) for m in naives]
         return moves + takes
 
 class Queen(Piece):
@@ -284,10 +302,10 @@ class Queen(Piece):
             tmp_col -= 1
 
         takes = [m for m in consider_takes if board.pieces[m].is_white != self.is_white]
-        takes = ['Qx' + pos_to_string(m) for m in takes]
         naives = [m for m in naives if board.is_available_cell(m)]
+        takes = [Move(self.symbol, curr_pos, m, is_take=True) for m in takes]
+        moves = [Move(self.symbol, curr_pos, m, is_take=False) for m in naives]
 
-        moves = ['Q' + pos_to_string(p) for p in naives]
         return moves + takes
 
 class King(Piece):
@@ -310,8 +328,11 @@ class King(Piece):
         moves = [m for m in naives if board.is_empty_cell(m)]
         takes = [m for m in naives if not board.is_empty_cell(m)]
         takes = [m for m in takes if board.pieces[m].is_white != self.is_white]
-        moves = ['K' + pos_to_string(p) for p in moves]
-        takes = ['Kx' + pos_to_string(p) for p in takes]
+        # moves = ['K' + pos_to_string(p) for p in moves]
+        # takes = ['Kx' + pos_to_string(p) for p in takes]
+
+        takes = [Move(self.symbol, curr_pos, m, is_take=True) for m in takes]
+        moves = [Move(self.symbol, curr_pos, m, is_take=False) for m in moves]
         return moves + takes
 
 class Rook(Piece):
@@ -362,10 +383,13 @@ class Rook(Piece):
             tmp_col -= 1
 
         takes = [m for m in consider_takes if board.pieces[m].is_white != self.is_white]
-        takes = ['Rx' + pos_to_string(m) for m in takes]
+        # takes = ['Rx' + pos_to_string(m) for m in takes]
 
         naives = [m for m in naives if board.is_available_cell(m)]
-        moves = ['R' + pos_to_string(p) for p in naives]
+        # moves = ['R' + pos_to_string(p) for p in naives]
+
+        takes = [Move(self.symbol, curr_pos, m, is_take=True) for m in takes]
+        moves = [Move(self.symbol, curr_pos, m, is_take=False) for m in naives]
         return moves + takes
 
 class Knight(Piece):
@@ -390,8 +414,11 @@ class Knight(Piece):
         moves = [m for m in candidates if board.is_empty_cell(m)]
         takes = [m for m in candidates if not board.is_empty_cell(m)]
         takes = [m for m in takes if board.pieces[m].is_white != self.is_white]
-        moves = ['N' + pos_to_string(p) for p in moves]
-        takes = ['Nx' + pos_to_string(p) for p in takes]
+        # moves = ['N' + pos_to_string(p) for p in moves]
+        # takes = ['Nx' + pos_to_string(p) for p in takes]
+
+        takes = [Move(self.symbol, curr_pos, m, is_take=True) for m in takes]
+        moves = [Move(self.symbol, curr_pos, m, is_take=False) for m in moves]
         return moves + takes
 
 class Pawn(Piece):
@@ -424,9 +451,11 @@ class Pawn(Piece):
 
         pos_takes = [m for m in pos_takes if not board.is_empty_cell(m)]
         pos_takes = [m for m in pos_takes if board.pieces[m].is_white != self.is_white]
-        suffix_takes = pos_to_string(curr_pos)[0]
-        takes = [suffix_takes + 'x' + pos_to_string(m) for m in pos_takes]
-        moves = [pos_to_string(p) for p in naives]
+        takes = [Move(from_pos=curr_pos, to_pos=m, is_take=True, piece_symbol=self.symbol) for m in pos_takes]
+        # suffix_takes = pos_to_string(curr_pos)[0]
+        # takes = [ suffix_takes + 'x' + pos_to_string(m) for m in pos_takes]
+        # moves = [pos_to_string(p) for p in naives]
+        moves = [Move(piece_symbol=self.symbol, from_pos=curr_pos, to_pos=m, is_take=False) for m in naives]
         return moves + takes
 
 # Press the green button in the gutter to run the script.
