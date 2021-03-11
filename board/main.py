@@ -57,38 +57,8 @@ class Board:
         self.add_piece('p', 'b1', is_white=True)
 
     def init_default(self):
-        self.add_piece('r', 'a1', is_white=True)
-        self.add_piece('n', 'b1', is_white=True)
-        self.add_piece('b', 'c1', is_white=True)
-        self.add_piece('q', 'd1', is_white=True)
-        self.add_piece('k', 'e1', is_white=True)
-        self.add_piece('b', 'f1', is_white=True)
-        self.add_piece('n', 'g1', is_white=True)
-        self.add_piece('r', 'h1', is_white=True)
-        self.add_piece('p', 'a2', is_white=True)
-        self.add_piece('p', 'b2', is_white=True)
-        self.add_piece('p', 'c2', is_white=True)
-        self.add_piece('p', 'd2', is_white=True)
-        self.add_piece('p', 'e2', is_white=True)
-        self.add_piece('p', 'f2', is_white=True)
-        self.add_piece('p', 'g2', is_white=True)
-        self.add_piece('p', 'h2', is_white=True)
-        self.add_piece('p', 'a7', is_white=False)
-        self.add_piece('p', 'b7', is_white=False)
-        self.add_piece('p', 'c7', is_white=False)
-        self.add_piece('p', 'd7', is_white=False)
-        self.add_piece('p', 'e7', is_white=False)
-        self.add_piece('p', 'f7', is_white=False)
-        self.add_piece('p', 'g7', is_white=False)
-        self.add_piece('p', 'h7', is_white=False)
-        self.add_piece('r', 'a8', is_white=False)
-        self.add_piece('n', 'b8', is_white=False)
-        self.add_piece('b', 'c8', is_white=False)
-        self.add_piece('q', 'd8', is_white=False)
-        self.add_piece('k', 'e8', is_white=False)
-        self.add_piece('b', 'f8', is_white=False)
-        self.add_piece('n', 'g8', is_white=False)
-        self.add_piece('r', 'h8', is_white=False)
+        fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+        self.init_fen(fen)
 
     def init_fen(self, fen):
         parts = fen.split(' ')
@@ -108,11 +78,14 @@ class Board:
 
 
     def get_possible_moves(self):
-        list_moves = []
+        moves = []
+        takes = []
         pieces_color = {pos: piece for (pos, piece) in self.pieces.items() if piece.is_white == self.white_to_play}
         for pos, piece in pieces_color.items():
-            list_moves += piece.available_moves(pos, self)
-        return [m.to_string() for m in list_moves]
+            tmpMoves, tmpTakes = piece.available_moves(pos, self)
+            moves += tmpMoves
+            takes += tmpTakes
+        return moves + takes
 
     def get_board(self):
         ret = []
@@ -153,7 +126,7 @@ class Bishop(Piece):
         self.symbol = 'b'
 
     def available_moves(self, curr_pos, board):
-        naives = []
+        moves = []
         consider_takes = []
         curr_row = curr_pos[0]
         curr_col = curr_pos[1]
@@ -165,7 +138,7 @@ class Bishop(Piece):
             if not board.is_empty_cell(pos):
                 consider_takes.append(pos)
                 break
-            naives.append(pos)
+            moves.append(pos)
             tmp_row += 1
             tmp_col += 1
 
@@ -176,7 +149,7 @@ class Bishop(Piece):
             if not board.is_empty_cell(pos):
                 consider_takes.append(pos)
                 break
-            naives.append(pos)
+            moves.append(pos)
             tmp_row -= 1
             tmp_col -= 1
 
@@ -187,7 +160,7 @@ class Bishop(Piece):
             if not board.is_empty_cell(pos):
                 consider_takes.append(pos)
                 break
-            naives.append(pos)
+            moves.append(pos)
             tmp_row += 1
             tmp_col -= 1
 
@@ -198,7 +171,7 @@ class Bishop(Piece):
             if not board.is_empty_cell(pos):
                 consider_takes.append(pos)
                 break
-            naives.append(pos)
+            moves.append(pos)
             tmp_row -= 1
             tmp_col += 1
 
@@ -207,8 +180,8 @@ class Bishop(Piece):
         takes = [Move(self.symbol, curr_pos, m, is_take=True) for m in takes]
 
         # moves = ['B' + pos_to_string(p) for p in naives]
-        moves = [Move(self.symbol, curr_pos, m, is_take=False) for m in naives]
-        return moves + takes
+        moves = [Move(self.symbol, curr_pos, m, is_take=False) for m in moves]
+        return (moves, takes)
 
 class Queen(Piece):
     def __init__(self, is_white):
@@ -306,7 +279,7 @@ class Queen(Piece):
         takes = [Move(self.symbol, curr_pos, m, is_take=True) for m in takes]
         moves = [Move(self.symbol, curr_pos, m, is_take=False) for m in naives]
 
-        return moves + takes
+        return moves, takes
 
 class King(Piece):
     def __init__(self, is_white):
@@ -333,7 +306,7 @@ class King(Piece):
 
         takes = [Move(self.symbol, curr_pos, m, is_take=True) for m in takes]
         moves = [Move(self.symbol, curr_pos, m, is_take=False) for m in moves]
-        return moves + takes
+        return moves, takes
 
 class Rook(Piece):
     def __init__(self, is_white):
@@ -390,7 +363,7 @@ class Rook(Piece):
 
         takes = [Move(self.symbol, curr_pos, m, is_take=True) for m in takes]
         moves = [Move(self.symbol, curr_pos, m, is_take=False) for m in naives]
-        return moves + takes
+        return moves, takes
 
 class Knight(Piece):
     def __init__(self, is_white):
@@ -419,7 +392,7 @@ class Knight(Piece):
 
         takes = [Move(self.symbol, curr_pos, m, is_take=True) for m in takes]
         moves = [Move(self.symbol, curr_pos, m, is_take=False) for m in moves]
-        return moves + takes
+        return moves, takes
 
 class Pawn(Piece):
     def __init__(self, is_white):
@@ -452,11 +425,8 @@ class Pawn(Piece):
         pos_takes = [m for m in pos_takes if not board.is_empty_cell(m)]
         pos_takes = [m for m in pos_takes if board.pieces[m].is_white != self.is_white]
         takes = [Move(from_pos=curr_pos, to_pos=m, is_take=True, piece_symbol=self.symbol) for m in pos_takes]
-        # suffix_takes = pos_to_string(curr_pos)[0]
-        # takes = [ suffix_takes + 'x' + pos_to_string(m) for m in pos_takes]
-        # moves = [pos_to_string(p) for p in naives]
         moves = [Move(piece_symbol=self.symbol, from_pos=curr_pos, to_pos=m, is_take=False) for m in naives]
-        return moves + takes
+        return moves, takes
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
