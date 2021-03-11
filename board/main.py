@@ -71,12 +71,29 @@ class Board:
         self.add_piece('n', 'g8', is_white=False)
         self.add_piece('r', 'h8', is_white=False)
 
+    def init_fen(self, fen):
+        parts = fen.split(' ')
+        print(parts)
+        self.white_to_play = parts[1] == 'w'
+
+        row_idx = 0
+        for row in reversed(parts[0].split('/')):
+            col_idx = 0
+            for c in row:
+                if c.lower() in ['r', 'n', 'b', 'k', 'q', 'p']:
+                    self.add_piece(c.lower(), pos_to_string((row_idx, col_idx)), c.isupper())
+                elif c.isdigit():
+                    nb_cells = int(c)
+                    col_idx += nb_cells - 1
+                col_idx += 1
+            row_idx += 1
+
+
     def get_possible_moves(self):
         list_moves = []
         pieces_color = {pos: piece for (pos, piece) in self.pieces.items() if piece.is_white == self.white_to_play}
         for pos, piece in pieces_color.items():
             list_moves += piece.available_moves(pos, self)
-        print(list_moves)
         return list_moves
 
     def get_board(self):
@@ -415,8 +432,10 @@ class Pawn(Piece):
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     b = Board()
-    b.init_simple()
+    b.init_default()
     for r in b.get_board():
         print(r)
+    moves = b.get_possible_moves()
+    print("# moves: {}".format(len(moves)))
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
