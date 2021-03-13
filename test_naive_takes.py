@@ -4,7 +4,7 @@ def test_pawn_takes_pawn():
     b = main.Board()
     b.add_piece('p', 'd4', is_white=True)
     b.add_piece('p', 'e5', is_white=False)
-    moves = b.get_possible_moves()
+    moves = b.get_naive_moves(from_white=True)
     takes = [m for m in moves if m.is_take]
     assert len(moves) == 2
     assert len(takes) == 1
@@ -17,7 +17,7 @@ def test_pawn_takes_pawns():
     b.add_piece('p', 'd4', is_white=True)
     b.add_piece('p', 'e5', is_white=False)
     b.add_piece('p', 'c5', is_white=False)
-    moves = b.get_possible_moves()
+    moves = b.get_naive_moves(from_white=True)
     moves_san = [m.to_string() for m in moves]
     takes = [m for m in moves if m.is_take]
     assert len(takes) == 2
@@ -31,7 +31,7 @@ def test_knight_takes_pawns():
     b.add_piece('n', 'd4', is_white=True)
     b.add_piece('p', 'e6', is_white=False)
     b.add_piece('p', 'c2', is_white=False)
-    moves = b.get_possible_moves()
+    moves = b.get_naive_moves(from_white=True)
     moves_san = [m.to_string() for m in moves]
     takes = [m for m in moves if m.is_take]
     assert len(moves) == 8
@@ -44,7 +44,7 @@ def test_rook_takes_pawn():
     b = main.Board()
     b.add_piece('r', 'a1', is_white=True)
     b.add_piece('p', 'a8', is_white=False)
-    moves = b.get_possible_moves()
+    moves = b.get_naive_moves(from_white=True)
     moves_san = [m.to_string() for m in moves]
     takes = [m for m in moves if m.is_take]
     assert len(moves) == 14
@@ -56,7 +56,7 @@ def test_bishop_takes_pawn():
     b = main.Board()
     b.add_piece('b', 'a1', is_white=True)
     b.add_piece('p', 'b2', is_white=False)
-    moves = b.get_possible_moves()
+    moves = b.get_naive_moves(from_white=True)
     moves_san = [m.to_string() for m in moves]
     takes = [m for m in moves if m.is_take]
     assert len(moves) == 1
@@ -69,7 +69,7 @@ def test_king_takes_pawns():
     b.add_piece('p', 'a2', is_white=False)
     b.add_piece('p', 'b1', is_white=False)
     b.add_piece('p', 'b2', is_white=False)
-    moves = b.get_possible_moves()
+    moves = b.get_naive_moves(from_white=True)
     moves_san = [m.to_string() for m in moves]
     takes = [m for m in moves if m.is_take]
     assert len(moves) == 3
@@ -89,7 +89,7 @@ def test_queen_takes_pawns():
     b.add_piece('p', 'c3', is_white=False)
     b.add_piece('p', 'c4', is_white=False)
     b.add_piece('p', 'c5', is_white=False)
-    moves = b.get_possible_moves()
+    moves = b.get_naive_moves(from_white=True)
     # moves_san = [m.to_string() for m in moves]
     takes = [m for m in moves if m.is_take]
     assert len(moves) == 8
