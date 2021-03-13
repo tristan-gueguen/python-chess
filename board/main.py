@@ -1,3 +1,5 @@
+import copy
+
 class Move:
     def __init__(self, piece, from_pos, to_pos, is_take=False):
         self.piece = piece
@@ -79,19 +81,40 @@ class Board:
                 col_idx += 1
             row_idx += 1
 
-
-    def get_possible_moves(self, from_white=None):
-        moves_from_white = self.white_to_play
-        if from_white is not None:
-            moves_from_white = from_white
+    # find moves, without checking is there would be a check
+    def get_naive_moves(self, from_white):
         moves = []
         takes = []
-        pieces_color = {pos: piece for (pos, piece) in self.pieces.items() if piece.is_white == moves_from_white}
+        pieces_color = {pos: piece for (pos, piece) in self.pieces.items() if piece.is_white == from_white}
         for pos, piece in pieces_color.items():
             tmpMoves, tmpTakes = piece.available_moves(pos, self)
             moves += tmpMoves
             takes += tmpTakes
         return moves + takes
+
+    def get_possible_moves(self, from_white=None):
+        moves_from_white = self.white_to_play
+        if from_white is not None:
+            moves_from_white = from_white
+        naive_moves = self.get_naive_moves(moves_from_white)
+        print("len naive moves {}".format(len(naive_moves)))
+        # moves = []
+        # takes = []
+        # pieces_color = {pos: piece for (pos, piece) in self.pieces.items() if piece.is_white == moves_from_white}
+        # for pos, piece in pieces_color.items():
+        #     tmpMoves, tmpTakes = piece.available_moves(pos, self)
+        #     moves += tmpMoves
+        #     takes += tmpTakes
+
+        no_check_moves = []
+        for m in naive_moves:
+            copy_board = copy.deepcopy(self)
+            del copy_board.pieces[m.from_pos]
+            copy_board.pieces[m.to_pos] = m.piece
+            is_check = copy_board.is_check(moves_from_white)
+            if not is_check:
+                no_check_moves.append(m)
+        return no_check_moves
 
     def process_move(self, move_str):
         all_moves = self.get_possible_moves()
@@ -111,10 +134,10 @@ class Board:
 
     def is_check(self, against_white):
         king_position = self.get_king_position(against_white)
-        black_moves = self.get_possible_moves(from_white=False)
-        black_takes = [m for m in black_moves if m.is_take]
-        black_takes_king = [m for m in black_takes if pos_to_string(m.to_pos) == king_position]
-        return len(black_takes_king) > 0
+        op_moves = self.get_naive_moves(from_white=not against_white)
+        op_takes = [m for m in op_moves if m.is_take]
+        op_takes_king = [m for m in op_takes if pos_to_string(m.to_pos) == king_position]
+        return len(op_takes_king) > 0
 
     def get_board(self):
         ret = []
