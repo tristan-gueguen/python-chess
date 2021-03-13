@@ -80,10 +80,13 @@ class Board:
             row_idx += 1
 
 
-    def get_possible_moves(self):
+    def get_possible_moves(self, from_white=None):
+        moves_from_white = self.white_to_play
+        if from_white is not None:
+            moves_from_white = from_white
         moves = []
         takes = []
-        pieces_color = {pos: piece for (pos, piece) in self.pieces.items() if piece.is_white == self.white_to_play}
+        pieces_color = {pos: piece for (pos, piece) in self.pieces.items() if piece.is_white == moves_from_white}
         for pos, piece in pieces_color.items():
             tmpMoves, tmpTakes = piece.available_moves(pos, self)
             moves += tmpMoves
@@ -99,6 +102,19 @@ class Board:
         del self.pieces[the_move.from_pos]
         self.pieces[the_move.to_pos] = the_move.piece
         self.white_to_play = not self.white_to_play
+
+    def get_king_position(self, white_king):
+        tmp = [pos for (pos, piece) in self.pieces.items() if piece.symbol == 'k' and piece.is_white == white_king]
+        if len(tmp) != 1:
+            raise Exception('There is not one king')
+        return pos_to_string(tmp[0])
+
+    def is_check(self, against_white):
+        king_position = self.get_king_position(against_white)
+        black_moves = self.get_possible_moves(from_white=False)
+        black_takes = [m for m in black_moves if m.is_take]
+        black_takes_king = [m for m in black_takes if pos_to_string(m.to_pos) == king_position]
+        return len(black_takes_king) > 0
 
     def get_board(self):
         ret = []
