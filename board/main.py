@@ -117,6 +117,70 @@ class Board:
                 ret.append(m)
         return ret
 
+    def can_castle_k_positions_white(self):
+        if self.get_king_position(white_king=True) != 'e1':
+            return False
+        if not self.is_empty_cell(string_to_pos('f1')):
+            return False
+        if not self.is_empty_cell(string_to_pos('g1')):
+            return False
+        if self.is_empty_cell(string_to_pos('h1')):
+            return False
+        if self.pieces[string_to_pos('h1')].symbol != 'r':
+            return False
+        return True
+
+    def can_castle_q_positions_white(self):
+        print('can_castle_q_positions_white')
+        if self.get_king_position(white_king=True) != 'e1':
+            print('king not in position')
+            return False
+        if not self.is_empty_cell(string_to_pos('d1')):
+            print('d1 not empty')
+            return False
+        if not self.is_empty_cell(string_to_pos('c1')):
+            print('c1 not empty')
+            return False
+        if not self.is_empty_cell(string_to_pos('b1')):
+            print('b1 not empty')
+            return False
+        if self.is_empty_cell(string_to_pos('a1')):
+            print('a1 empty')
+            return False
+        if self.pieces[string_to_pos('a1')].symbol != 'r':
+            print('a1 not a rook')
+            return False
+        return True
+
+    def can_castle_k_positions_black(self):
+        if self.get_king_position(white_king=False) != 'e8':
+            return False
+        if not self.is_empty_cell(string_to_pos('f8')):
+            return False
+        if not self.is_empty_cell(string_to_pos('g8')):
+            return False
+        if self.is_empty_cell(string_to_pos('h8')):
+            return False
+        if self.pieces[string_to_pos('h8')].symbol != 'r':
+            return False
+        return True
+
+    def can_castle_q_positions_black(self):
+        if self.get_king_position(white_king=False) != 'e8':
+            return False
+        if not self.is_empty_cell(string_to_pos('d8')):
+            return False
+        if not self.is_empty_cell(string_to_pos('c8')):
+            return False
+        if not self.is_empty_cell(string_to_pos('b8')):
+            return False
+        if self.is_empty_cell(string_to_pos('a8')):
+            return False
+        if self.pieces[string_to_pos('a8')].symbol != 'r':
+            return False
+        return True
+
+
     def can_castle_q_white(self):
         if not self.white_can_castle_q:
             return False
@@ -260,6 +324,25 @@ class Board:
 
         del self.pieces[the_move.from_pos]
         self.pieces[the_move.to_pos] = the_move.piece
+
+        if the_move.to_string() == 'O-O':
+            if the_move.piece.is_white:
+                del self.pieces[string_to_pos('h1')]
+                self.pieces[string_to_pos('f1')] = Rook(is_white=True)
+            else:
+                del self.pieces[string_to_pos('h8')]
+                self.pieces[string_to_pos('f8')] = Rook(is_white=False)
+
+        if the_move.to_string() == 'O-O-O':
+            print('doing a castle')
+            if the_move.piece.is_white:
+                print('for white')
+                del self.pieces[string_to_pos('a1')]
+                self.pieces[string_to_pos('d1')] = Rook(is_white=True)
+            else:
+                del self.pieces[string_to_pos('a8')]
+                self.pieces[string_to_pos('d8')] = Rook(is_white=False)
+
         self.white_to_play = not self.white_to_play
 
     def get_king_position(self, white_king):
@@ -491,9 +574,23 @@ class King(Piece):
         takes = [m for m in takes if board.pieces[m].is_white != self.is_white]
         # moves = ['K' + pos_to_string(p) for p in moves]
         # takes = ['Kx' + pos_to_string(p) for p in takes]
+        # if string_to_pos('e1') == curr_pos:
+
 
         takes = [Move(self, curr_pos, m, is_take=True) for m in takes]
         moves = [Move(self, curr_pos, m, is_take=False) for m in moves]
+
+        if self.is_white:
+            if board.can_castle_q_positions_white():
+                moves.append(Move(self, curr_pos, string_to_pos('c1')))
+            if board.can_castle_k_positions_white():
+                moves.append(Move(self, curr_pos, string_to_pos('g1')))
+        else:
+            if board.can_castle_q_positions_black():
+                moves.append(Move(self, curr_pos, string_to_pos('c8')))
+            if board.can_castle_k_positions_black():
+                moves.append(Move(self, curr_pos, string_to_pos('g8')))
+
         return moves, takes
 
 class Rook(Piece):

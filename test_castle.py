@@ -90,3 +90,14 @@ def test_castle_in_list_moves():
     moves = [m.to_string() for m in b.get_possible_moves(from_white=True)]
     assert 'O-O-O' in moves
     assert 'O-O' in moves
+    b.process_move('O-O-O')
+
+    should_be = ['....k...']
+    should_be.append('........')
+    should_be.append('........')
+    should_be.append('........')
+    should_be.append('........')
+    should_be.append('........')
+    should_be.append('........')
+    should_be.append('..KR...R')
+    assert should_be == b.get_board()
