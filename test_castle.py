@@ -80,3 +80,13 @@ def test_cant_castle_q_cause_check_3():
     b.add_piece('r', 'a1', is_white=True)
     b.add_piece('q', 'c4', is_white=False)
     assert not b.can_castle_q_white()
+
+def test_castle_in_list_moves():
+    b = main.Board()
+    b.add_piece('k', 'e1', is_white=True)
+    b.add_piece('k', 'e8', is_white=False)
+    b.add_piece('r', 'a1', is_white=True)
+    b.add_piece('r', 'h1', is_white=True)
+    moves = [m.to_string() for m in b.get_possible_moves(from_white=True)]
+    assert 'O-O-O' in moves
+    assert 'O-O' in moves
