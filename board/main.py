@@ -8,6 +8,16 @@ class Move:
         self.is_take = is_take
 
     def to_string(self):
+        if self.piece.symbol.upper() == 'K':
+            if pos_to_string(self.from_pos) == 'e1' and pos_to_string(self.to_pos) == 'g1':
+                return 'O-O'
+            if pos_to_string(self.from_pos) == 'e1' and pos_to_string(self.to_pos) == 'c1':
+                return 'O-O-O'
+            if pos_to_string(self.from_pos) == 'e8' and pos_to_string(self.to_pos) == 'g8':
+                return 'O-O'
+            if pos_to_string(self.from_pos) == 'e8' and pos_to_string(self.to_pos) == 'c8':
+                return 'O-O-O'
+
         str_takes = ''
         if self.is_take:
             str_takes = 'x'
@@ -36,6 +46,10 @@ class Board:
     def __init__(self, white_to_play=True):
         self.pieces = {}
         self.white_to_play = white_to_play
+        self.black_can_castle_q = True
+        self.black_can_castle_k = True
+        self.white_can_castle_q = True
+        self.white_can_castle_k = True
 
     def add_piece(self, symbol, pos_str, is_white):
         pos = string_to_pos(pos_str)
@@ -92,29 +106,129 @@ class Board:
             takes += tmpTakes
         return moves + takes
 
-    def get_possible_moves(self, from_white=None):
-        moves_from_white = self.white_to_play
-        if from_white is not None:
-            moves_from_white = from_white
-        naive_moves = self.get_naive_moves(moves_from_white)
-        print("len naive moves {}".format(len(naive_moves)))
-        # moves = []
-        # takes = []
-        # pieces_color = {pos: piece for (pos, piece) in self.pieces.items() if piece.is_white == moves_from_white}
-        # for pos, piece in pieces_color.items():
-        #     tmpMoves, tmpTakes = piece.available_moves(pos, self)
-        #     moves += tmpMoves
-        #     takes += tmpTakes
-
-        no_check_moves = []
-        for m in naive_moves:
+    def remove_would_check_moves(self, moves, white_to_play):
+        ret = []
+        for m in moves:
             copy_board = copy.deepcopy(self)
             del copy_board.pieces[m.from_pos]
             copy_board.pieces[m.to_pos] = m.piece
-            is_check = copy_board.is_check(moves_from_white)
+            is_check = copy_board.is_check(white_to_play)
             if not is_check:
-                no_check_moves.append(m)
-        return no_check_moves
+                ret.append(m)
+        return ret
+
+    def can_castle_q_white(self):
+        if not self.white_can_castle_q:
+            return False
+        if self.is_check(against_white=True):
+            return False
+
+        copy_board = copy.deepcopy(self)
+        del copy_board.pieces[string_to_pos('e1')]
+        copy_board.add_piece('k', 'd1', is_white=True)
+        if copy_board.is_check(against_white=True):
+            return False
+
+        copy_board = copy.deepcopy(self)
+        del copy_board.pieces[string_to_pos('e1')]
+        copy_board.add_piece('k', 'c1', is_white=True)
+        if copy_board.is_check(against_white=True):
+            return False
+
+        return True
+
+    def can_castle_k_white(self):
+        if not self.white_can_castle_k:
+            return False
+        if self.is_check(against_white=True):
+            return False
+
+        copy_board = copy.deepcopy(self)
+        del copy_board.pieces[string_to_pos('e1')]
+        copy_board.add_piece('k', 'f1', is_white=True)
+        if copy_board.is_check(against_white=True):
+            return False
+
+        copy_board = copy.deepcopy(self)
+        del copy_board.pieces[string_to_pos('e1')]
+        copy_board.add_piece('k', 'g1', is_white=True)
+        if copy_board.is_check(against_white=True):
+            return False
+
+        return True
+
+    def can_castle_q_black(self):
+        if not self.black_can_castle_q:
+            return False
+        if self.is_check(against_white=False):
+            return False
+
+        copy_board = copy.deepcopy(self)
+        del copy_board.pieces[string_to_pos('e8')]
+        copy_board.add_piece('k', 'f8', is_white=False)
+        if copy_board.is_check(against_white=False):
+            return False
+
+        copy_board = copy.deepcopy(self)
+        del copy_board.pieces[string_to_pos('e8')]
+        copy_board.add_piece('k', 'g8', is_white=False)
+        if copy_board.is_check(against_white=False):
+            return False
+
+        return True
+
+    def can_castle_k_black(self):
+        if not self.black_can_castle_k:
+            return False
+        if self.is_check(against_white=False):
+            return False
+
+        copy_board = copy.deepcopy(self)
+        del copy_board.pieces[string_to_pos('e8')]
+        copy_board.add_piece('k', 'd8', is_white=False)
+        if copy_board.is_check(against_white=False):
+            return False
+
+        copy_board = copy.deepcopy(self)
+        del copy_board.pieces[string_to_pos('e8')]
+        copy_board.add_piece('k', 'c8', is_white=False)
+        if copy_board.is_check(against_white=False):
+            return False
+
+        return True
+
+    def remove_illegal_castle(self, moves, white_to_play):
+        ret = []
+        for m in moves:
+            if m.to_string() == 'O-O':
+                if white_to_play:
+                    if self.can_castle_k_white():
+                        ret.append(m)
+                else:
+                    if self.can_castle_k_black():
+                        ret.append(m)
+            elif m.to_string() == 'O-O-O':
+                if white_to_play:
+                    if self.can_castle_q_white():
+                        ret.append(m)
+                else:
+                    if self.can_castle_q_black():
+                        ret.append(m)
+            else:
+                ret.append(m)
+        return ret
+
+    def get_possible_moves(self, from_white=None):
+        white_to_play = self.white_to_play
+        if from_white is not None:
+            white_to_play = from_white
+        naive_moves = self.get_naive_moves(white_to_play)
+        print("len naive moves {}".format(len(naive_moves)))
+
+        legal_moves = self.remove_would_check_moves(naive_moves, white_to_play)
+        legal_moves = self.remove_illegal_castle(legal_moves, white_to_play)
+
+        return legal_moves
 
     def process_move(self, move_str):
         all_moves = self.get_possible_moves()
@@ -122,6 +236,28 @@ class Board:
         if len(match_moves) != 1:
             raise Exception("Move {} not found.".format(move_str))
         the_move = match_moves[0]
+
+        ##if king move => disable castle
+        if the_move.piece.symbol == 'k':
+            if the_move.piece.is_white:
+                self.white_can_castle_q = False
+                self.white_can_castle_k = False
+            else:
+                self.black_can_castle_q = False
+                self.black_can_castle_k = False
+        ##if rook => disable castle
+        if the_move.piece.symbol == 'r':
+            if the_move.piece.is_white:
+                if pos_to_string(the_move.from_pos) == 'a1':
+                    self.white_can_castle_q = False
+                if pos_to_string(the_move.from_pos) == 'h1':
+                    self.white_can_castle_k = False
+            else:
+                if pos_to_string(the_move.from_pos) == 'a8':
+                    self.white_can_castle_q = False
+                if pos_to_string(the_move.from_pos) == 'h8':
+                    self.white_can_castle_k = False
+
         del self.pieces[the_move.from_pos]
         self.pieces[the_move.to_pos] = the_move.piece
         self.white_to_play = not self.white_to_play
