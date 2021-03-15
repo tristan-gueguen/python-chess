@@ -48,3 +48,12 @@ def test_random():
     should_be.append('RNB.K.NR')
     assert should_be == b.get_board()
     assert b.white_to_play == False
+
+def test_castle_1():
+    fen = "r2k1b1r/p1p1pppp/1PP5/8/3P2n1/8/PP3PPP/RNB1K1NR b KQ - 0 10"
+    b = main.Board()
+    b.init_fen(fen)
+    assert not b.black_can_castle_q
+    assert not b.black_can_castle_k
+    assert b.white_can_castle_k
+    assert b.white_can_castle_q

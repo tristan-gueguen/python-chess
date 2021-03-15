@@ -39,3 +39,12 @@ def test_recognize_check_bishop_from_distance():
     b.add_piece('k', 'h8', is_white=True)
     b.add_piece('b', 'a1', is_white=False)
     assert b.is_check(against_white=True)
+
+def test_if_check_have_to_move():
+    b = main.Board(white_to_play=False)
+    b.add_piece('k', 'e8', is_white=False)
+    b.add_piece('p', 'a7', is_white=False)
+    b.add_piece('q', 'e1', is_white=True)
+    b.add_piece('k', 'h1', is_white=True)
+    moves = [m.to_string() for m in b.get_possible_moves()]
+    assert len(moves) == 4

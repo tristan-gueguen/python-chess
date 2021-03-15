@@ -1,5 +1,6 @@
 from .piece import Piece
 from .move import Move
+from ..utils import pos_to_string
 
 class Pawn(Piece):
     def __init__(self, is_white):
@@ -29,8 +30,12 @@ class Pawn(Piece):
             pos_takes = [(curr_pos[0] - 1, curr_pos[1] + 1), (curr_pos[0] - 1, curr_pos[1] - 1)]
         naives = [m for m in naives if board.is_valid_cell(m)]
 
-        pos_takes = [m for m in pos_takes if not board.is_empty_cell(m)]
-        pos_takes = [m for m in pos_takes if board.pieces[m].is_white != self.is_white]
-        takes = [Move(from_pos=curr_pos, to_pos=m, is_take=True, piece=self) for m in pos_takes]
+        take_en_passant = [m for m in pos_takes if board.en_passant == pos_to_string(m)]
+        other_takes = [m for m in pos_takes if not board.is_empty_cell(m)]
+        other_takes = [m for m in other_takes if board.pieces[m].is_white != self.is_white]
+        takes = take_en_passant + other_takes
+        # pos_takes = [m for m in pos_takes if not board.is_empty_cell(m)]
+        # pos_takes = [m for m in pos_takes if board.pieces[m].is_white != self.is_white]
+        takes = [Move(from_pos=curr_pos, to_pos=m, is_take=True, piece=self) for m in takes]
         moves = [Move(piece=self, from_pos=curr_pos, to_pos=m, is_take=False) for m in naives]
         return moves, takes

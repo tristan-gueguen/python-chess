@@ -16,6 +16,7 @@ class Board:
         self.black_can_castle_k = True
         self.white_can_castle_q = True
         self.white_can_castle_k = True
+        self.en_passant = ''
 
     def add_piece(self, symbol, pos_str, is_white):
         pos = string_to_pos(pos_str)
@@ -48,6 +49,14 @@ class Board:
     def init_fen(self, fen):
         parts = fen.split(' ')
         self.white_to_play = parts[1] == 'w'
+
+        self.en_passant = parts[3]
+
+        castles = parts[2]
+        self.black_can_castle_q = 'q' in castles
+        self.black_can_castle_k = 'k' in castles
+        self.white_can_castle_q = 'Q' in castles
+        self.white_can_castle_k = 'K' in castles
 
         row_idx = 0
         for row in reversed(parts[0].split('/')):
@@ -308,7 +317,17 @@ class Board:
             else:
                 del self.pieces[string_to_pos('a8')]
                 self.pieces[string_to_pos('d8')] = Rook(is_white=False)
+        ##if move is a take en passant, remove captured piece
+        if pos_to_string(the_move.to_pos) == self.en_passant and the_move.is_take:
+            row_take = the_move.to_pos[0]
+            col_take = the_move.to_pos[1]
+            if row_take == 5:
+                del self.pieces[(4, col_take)]
+            else:
+                del self.pieces[(3, col_take)]
 
+
+        self.en_passant = the_move.get_en_passant()
         self.white_to_play = not self.white_to_play
 
     def get_king_position(self, white_king):

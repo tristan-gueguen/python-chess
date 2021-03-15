@@ -7,6 +7,18 @@ class Move:
         self.to_pos = to_pos
         self.is_take = is_take
 
+    def get_en_passant(self):
+        if self.piece.symbol.upper() != 'P':
+            return '-'
+        row_from = self.from_pos[0]
+        row_to = self.to_pos[0]
+        row_between = int((row_to + row_from) / 2)
+        col_from = self.from_pos[1]
+        if abs(row_to - row_from) == 2:
+            return pos_to_string((row_between, col_from))
+        return '-'
+
+
     def to_string(self):
         if self.piece.symbol.upper() == 'K':
             if pos_to_string(self.from_pos) == 'e1' and pos_to_string(self.to_pos) == 'g1':
