@@ -1,4 +1,7 @@
 import copy
+
+from flask import jsonify
+
 from .pieces import Pawn
 from .pieces import Queen
 from .pieces import King
@@ -366,6 +369,12 @@ class Board:
         row = pos[0]
         col = pos[1]
         return row >= 0 and row <= 7 and col >= 0 and col <= 7
+
+    def get_json(self):
+        ret = {}
+        ret['board'] = self.get_board()
+        ret['moves'] = [m.to_json() for m in self.get_possible_moves()]
+        return jsonify(ret)
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':

@@ -41,5 +41,14 @@ class Move:
                 str_piece = pos_to_string(self.from_pos)[0]
         return str_piece + str_takes + pos_to_string(self.to_pos)
 
+    def to_json(self):
+        return {
+            "to": pos_to_string(self.to_pos),
+            "from": pos_to_string(self.from_pos),
+            "piece": self.piece.print_symbol(),
+            "move_str": self.to_string(),
+            "is_take": self.is_take
+        }
+
     # def __str__(self):
     #     return self.piece_symbol
