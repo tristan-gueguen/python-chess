@@ -19,7 +19,17 @@ class Board:
         self.black_can_castle_k = True
         self.white_can_castle_q = True
         self.white_can_castle_k = True
-        self.en_passant = ''
+        self.en_passant = '-'
+
+    def reset(self):
+        self.pieces = {}
+        self.white_to_play = True
+        self.black_can_castle_q = True
+        self.black_can_castle_k = True
+        self.white_can_castle_q = True
+        self.white_can_castle_k = True
+        self.en_passant = '-'
+
 
     def add_piece(self, symbol, pos_str, is_white):
         pos = string_to_pos(pos_str)
@@ -50,6 +60,7 @@ class Board:
         self.init_fen(fen)
 
     def init_fen(self, fen):
+        self.reset()
         parts = fen.split(' ')
         self.white_to_play = parts[1] == 'w'
 
