@@ -84,6 +84,38 @@ class Board:
                 col_idx += 1
             row_idx += 1
 
+    def to_fen(self):
+        fen_to_play = 'w' if self.white_to_play else 'b'
+        castles = []
+        if self.white_can_castle_k : castles.append('K')
+        if self.white_can_castle_q : castles.append('Q')
+        if self.black_can_castle_k : castles.append('k')
+        if self.black_can_castle_q : castles.append('q')
+        fen_castles = '-'
+        if len(castles) > 0:
+            fen_castles = ''.join(castles)
+
+        fen_rows = []
+        the_board = self.get_board()
+        for r in the_board:
+            fen_row = []
+            count_empty = 0
+            for c in r:
+                if c == '.':
+                    count_empty += 1
+                else:
+                    if (count_empty > 0):
+                        fen_row.append(str(count_empty))
+                    fen_row.append(c)
+                    count_empty = 0
+
+            if (count_empty > 0):
+                fen_row.append(str(count_empty))
+            fen_rows.append("".join(fen_row))
+        fen_board = "/".join(fen_rows)
+
+        return " ".join([fen_board, fen_to_play, fen_castles, self.en_passant, "0 1"])
+
     # find moves, without checking is there would be a check
     def get_naive_moves(self, from_white):
         moves = []
@@ -120,24 +152,17 @@ class Board:
         return True
 
     def can_castle_q_positions_white(self):
-        print('can_castle_q_positions_white')
         if self.get_king_position(white_king=True) != 'e1':
-            print('king not in position')
             return False
         if not self.is_empty_cell(string_to_pos('d1')):
-            print('d1 not empty')
             return False
         if not self.is_empty_cell(string_to_pos('c1')):
-            print('c1 not empty')
             return False
         if not self.is_empty_cell(string_to_pos('b1')):
-            print('b1 not empty')
             return False
         if self.is_empty_cell(string_to_pos('a1')):
-            print('a1 empty')
             return False
         if self.pieces[string_to_pos('a1')].symbol != 'r':
-            print('a1 not a rook')
             return False
         return True
 
@@ -210,7 +235,7 @@ class Board:
 
         return True
 
-    def can_castle_q_black(self):
+    def can_castle_k_black(self):
         if not self.black_can_castle_q:
             return False
         if self.is_check(against_white=False):
@@ -230,7 +255,7 @@ class Board:
 
         return True
 
-    def can_castle_k_black(self):
+    def can_castle_q_black(self):
         if not self.black_can_castle_k:
             return False
         if self.is_check(against_white=False):
@@ -323,9 +348,7 @@ class Board:
                 self.pieces[string_to_pos('f8')] = Rook(is_white=False)
 
         if the_move.to_string() == 'O-O-O':
-            print('doing a castle')
             if the_move.piece.is_white:
-                print('for white')
                 del self.pieces[string_to_pos('a1')]
                 self.pieces[string_to_pos('d1')] = Rook(is_white=True)
             else:
@@ -385,6 +408,7 @@ class Board:
         ret = {}
         ret['board'] = self.get_board()
         ret['moves'] = [m.to_json() for m in self.get_possible_moves()]
+        ret['fen'] = self.to_fen()
         return jsonify(ret)
 
 # Press the green button in the gutter to run the script.

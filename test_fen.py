@@ -17,6 +17,27 @@ def test_start_position():
     assert should_be == b.get_board()
     assert b.white_to_play == True
 
+def test_reverse_start_position():
+    b = main.Board()
+    b.init_default()
+    fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+    assert b.to_fen() == fen
+
+def test_reverse_few_moves():
+    b = main.Board()
+    b.init_default()
+    b.process_move('d4')
+    b.process_move('e5')
+    b.process_move('dxe5')
+    b.process_move('Nf6')
+    b.process_move('f3')
+    b.process_move('Bb4')
+    b.process_move('Qd2')
+    b.process_move('O-O')
+    fen = "rnbq1rk1/pppp1ppp/5n2/4P3/1b6/5P2/PPPQP1PP/RNB1KBNR w KQ - 0 1"
+    assert b.to_fen() == fen
+
+
 def test_few_moves():
     fen = "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2"
     b = main.Board()
