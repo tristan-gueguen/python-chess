@@ -1,11 +1,12 @@
 from ..utils import pos_to_string
 
 class Move:
-    def __init__(self, piece, from_pos, to_pos, is_take=False):
+    def __init__(self, piece, from_pos, to_pos, is_take=False, prom_str=""):
         self.piece = piece
         self.from_pos = from_pos
         self.to_pos = to_pos
         self.is_take = is_take
+        self.prom_str = prom_str
 
     def get_en_passant(self):
         if self.piece.symbol.upper() != 'P':
@@ -20,6 +21,9 @@ class Move:
 
 
     def to_string(self):
+        str_prom = ""
+        if self.prom_str != '':
+            str_prom = "={}".format(self.prom_str)
         if self.piece.symbol.upper() == 'K':
             if pos_to_string(self.from_pos) == 'e1' and pos_to_string(self.to_pos) == 'g1':
                 return 'O-O'
@@ -39,7 +43,7 @@ class Move:
         else:
             if self.is_take:
                 str_piece = pos_to_string(self.from_pos)[0]
-        return str_piece + str_takes + pos_to_string(self.to_pos)
+        return str_piece + str_takes + pos_to_string(self.to_pos) + str_prom
 
     def to_json(self):
         return {

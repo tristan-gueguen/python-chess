@@ -363,6 +363,10 @@ class Board:
             else:
                 del self.pieces[(3, col_take)]
 
+        if the_move.prom_str != '':
+            del self.pieces[the_move.to_pos]
+            self.add_piece(the_move.prom_str.lower(), pos_to_string(the_move.to_pos), the_move.piece.is_white)
+
 
         self.en_passant = the_move.get_en_passant()
         self.white_to_play = not self.white_to_play

@@ -34,8 +34,22 @@ class Pawn(Piece):
         other_takes = [m for m in pos_takes if not board.is_empty_cell(m)]
         other_takes = [m for m in other_takes if board.pieces[m].is_white != self.is_white]
         takes = take_en_passant + other_takes
-        # pos_takes = [m for m in pos_takes if not board.is_empty_cell(m)]
-        # pos_takes = [m for m in pos_takes if board.pieces[m].is_white != self.is_white]
-        takes = [Move(from_pos=curr_pos, to_pos=m, is_take=True, piece=self) for m in takes]
-        moves = [Move(piece=self, from_pos=curr_pos, to_pos=m, is_take=False) for m in naives]
-        return moves, takes
+
+        last_row = 7 if self.is_white else 0
+        def_takes = []
+        for t in takes:
+            if t[0] == last_row:
+                for s in ['Q', 'B', 'N', 'R']:
+                    def_takes.append(Move(from_pos=curr_pos, to_pos=t, is_take=True, piece=self, prom_str=s))
+            else:
+                def_takes.append(Move(from_pos=curr_pos, to_pos=t, is_take=True, piece=self))
+
+        def_moves = []
+        for m in naives:
+            if m[0] == last_row:
+                for s in ['Q', 'B', 'N', 'R']:
+                    def_moves.append(Move(from_pos=curr_pos, to_pos=m, is_take=False, piece=self, prom_str=s))
+            else:
+                def_moves.append(Move(from_pos=curr_pos, to_pos=m, is_take=False, piece=self))
+
+        return def_moves, def_takes
