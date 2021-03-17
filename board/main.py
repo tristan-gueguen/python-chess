@@ -436,6 +436,9 @@ class Board:
         ret['board'] = self.get_board()
         ret['moves'] = [m.to_json() for m in self.get_possible_moves()]
         ret['fen'] = self.to_fen()
+        ret['check'] = '-'
+        if self.is_check(self.white_to_play):
+            ret['check'] = self.get_king_position(self.white_to_play)
         return jsonify(ret)
 
 # Press the green button in the gutter to run the script.
