@@ -8,6 +8,7 @@ from .pieces import King
 from .pieces import Bishop
 from .pieces import Rook
 from .pieces import Knight
+from .pieces import Move
 from .utils import pos_to_string
 from .utils import string_to_pos
 
@@ -306,7 +307,29 @@ class Board:
         legal_moves = self.remove_would_check_moves(naive_moves, white_to_play)
         legal_moves = self.remove_illegal_castle(legal_moves, white_to_play)
 
-        return legal_moves
+        legal_moves_cleaned_same_position = []
+        print("Nb of legal moves {}".format(len(legal_moves)))
+        for m in legal_moves:
+            similar_moves = [tmp_m for tmp_m in legal_moves if (tmp_m.to_pos == m.to_pos and tmp_m.piece.symbol == m.piece.symbol and tmp_m.from_pos != m.from_pos)]
+            nb_similar = len(similar_moves)
+            print(nb_similar)
+            if nb_similar > 0:
+                print("More than 0 move for {}".format(m.to_json()))
+                if nb_similar > 1:
+                    raise Exception("More than two pieces can go to the same position, not handled.")
+                str_pos_0 = pos_to_string(m.from_pos)
+                str_pos_1 = pos_to_string(similar_moves[0].from_pos)
+                #same row
+                if str_pos_0[0] == str_pos_1[0]:
+                    print("specify row")
+                    legal_moves_cleaned_same_position.append(Move(m.piece, m.from_pos, m.to_pos, m.is_take, specify_row=True))
+                else:
+                    print("specify col")
+                    legal_moves_cleaned_same_position.append(Move(m.piece, m.from_pos, m.to_pos, m.is_take, specify_col=True))
+            else:
+                legal_moves_cleaned_same_position.append(m)
+
+        return legal_moves_cleaned_same_position
 
     def process_move(self, move_str):
         all_moves = self.get_possible_moves()

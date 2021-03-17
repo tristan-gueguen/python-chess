@@ -1,14 +1,14 @@
 from board import main
 
 def test_same_col_rooks():
-    fen = "k7/7R/8/8/8/7R/K7/8 w - - 0 1"
+    fen = "k7/6KR/8/8/8/6PR/8/8 w - - 0 1"
     b = main.Board()
     b.init_fen(fen)
     moves = [m.to_string() for m in b.get_possible_moves()]
+    print(moves)
     assert 'Rh5' not in moves
     assert 'R7h5' in moves
     assert 'R3h5' in moves
-    assert 'Re7' in moves
 
 def test_same_row_rooks():
     fen = "k7/8/8/8/8/3R3R/K7/8 w - - 0 1"

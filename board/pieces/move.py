@@ -1,12 +1,14 @@
 from ..utils import pos_to_string
 
 class Move:
-    def __init__(self, piece, from_pos, to_pos, is_take=False, prom_str=""):
+    def __init__(self, piece, from_pos, to_pos, is_take=False, prom_str="", specify_col=False, specify_row=False):
         self.piece = piece
         self.from_pos = from_pos
         self.to_pos = to_pos
         self.is_take = is_take
         self.prom_str = prom_str
+        self.specify_col = specify_col
+        self.specify_row = specify_row
 
     def get_en_passant(self):
         if self.piece.symbol.upper() != 'P':
@@ -40,6 +42,11 @@ class Move:
         str_piece = ''
         if self.piece.symbol.upper() != 'P':
             str_piece = self.piece.symbol.upper()
+            if self.specify_row:
+                str_piece += pos_to_string(self.from_pos)[1]
+            if self.specify_col:
+                str_piece += pos_to_string(self.from_pos)[0]
+
         else:
             if self.is_take:
                 str_piece = pos_to_string(self.from_pos)[0]
